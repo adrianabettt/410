@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Detetive de Registros - BNCC</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; background: #f0f2f5; 
+            margin: 0; padding: 10px; height: 100vh; 
+            display: flex; flex-direction: column; overflow: hidden; text-align: center;
+        }
+
+        h1 { color: #2d3436; margin: 5px 0; font-size: 22px; }
+        .instrucoes { background: #ffffff; padding: 10px; border-radius: 8px; font-size: 14px; margin: 5px auto; max-width: 800px; border-bottom: 4px solid #0984e3; }
+
+        #jogo-container { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        .pergunta-card { 
+            background: white; padding: 20px; border-radius: 15px; 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1); width: 450px; 
+            animation: deslizar 0.5s ease-out;
+        }
+
+        @keyframes deslizar { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        
+        .btn-opcao { 
+            background: #0984e3; color: white; border: none; padding: 12px; 
+            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .btn-opcao:hover { background: #00cec9; transform: scale(1.05); }
+
+        /* Modal */
+        #modal {
+            display: none; position: fixed; z-index: 100; left: 0; top: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: white; padding: 25px; border-radius: 20px; width: 400px;
+            text-align: center; position: relative;
+        }
+        .nota-final { font-size: 50px; font-weight: bold; color: #00b894; }
+        .relatorio { 
+            background: #f1f2f6; border: 1px solid #bdc3c7; border-radius: 8px;
+            height: 150px; overflow-y: auto; text-align: left; padding: 10px; 
+            font-size: 13px; margin: 15px 0; 
+        }
+
+        footer { font-size: 11px; color: #636e72; margin-top: auto; padding: 5px; border-top: 1px solid #bdc3c7; }
+    </style>
+</head>
+<body>
+
+    <h1>🔍 Detetive de Registros</h1>
+    
+    <div class="instrucoes">
+        <strong>Missão:</strong> Analise o objeto e decida qual é a melhor forma de organizá-lo em um registro (ficha). 
+        <p>Cada acerto vale 1 ponto. Erros subtraem 2 pontos da nota máxima (10).</p>
+    </div>
+
+    <div id="jogo-container">
+        <div id="questoes-area">
+            </div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <h2 id="modal-titulo">Resultado da Investigação</h2>
+            <div class="nota-final" id="vNota">10.0</div>
+            <div class="relatorio" id="vRelatorio"></div>
+            <button onclick="location.reload()" style="padding: 10px 20px; cursor: pointer; border-radius: 8px; border: none; background: #0984e3; color: white; font-weight: bold;">Refazer Missão</button>
+        </div>
+    </div>
+
+    <footer> 
+        <p><strong>Material Pedagógico - Profª Adriana Bett Terebinto © 2026</strong></p> 
+        <p>São Lourenço do Oeste - SC</p> 
+    </footer>
+
+    <script>
+        const perguntasBase = [
+            { obj: "📚 Livro de Biblioteca", resp: "Título, Autor e Ano", errada: "Cor da capa e Peso" },
+            { obj: "👤 Aluno na Escola", resp: "Nome, Turma e Nota", errada: "Comida favorita e Altura" },
+            { obj: "🚗 Carro no Estacionamento", resp: "Placa, Modelo e Cor", errada: "Nome do dono e Velocidade" },
+            { obj: "🍕 Pedido de Pizza", resp: "Sabor, Endereço e Valor", errada: "Tamanho da caixa e Nome do Pizzaiolo" },
+            { obj: "🎮 Personagem de RPG", resp: "Nome, Poder e Vida", errada: "Data de nascimento e Cidade" }
+        ];
+
+        let indiceAtual = 0;
+        let nota = 10;
+        let logs = [];
+
+        // Algoritmo Fisher-Yates para embaralhar as perguntas
+        function embaralhar(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        embaralhar(perguntasBase);
+
+        function mostrarPergunta() {
+            if (indiceAtual >= perguntasBase.length) {
+                finalizar();
+                return;
+            }
+
+            const p = perguntasBase[indiceAtual];
+            const area = document.getElementById('questoes-area');
+            
+            // Embaralhar as opções de resposta (Direita/Esquerda)
+            let botoes = [
+                `<button class="btn-opcao" onclick="verificar(true)">${p.resp}</button>`,
+                `<button class="btn-opcao" onclick="verificar(false)">${p.errada}</button>`
+            ];
+            embaralhar(botoes);
+
+            area.innerHTML = `
+                <div class="pergunta-card">
+                    <p>Como devemos registrar as informações de um:</p>
+                    <h3>${p.obj}</h3>
+                    <div class="opcoes">${botoes.join('')}</div>
+                    <p style="font-size: 12px; color: #636e72; margin-top: 15px;">Pergunta ${indiceAtual + 1} de 5</p>
+                </div>
+            `;
+        }
+
+        function verificar(correto) {
+            const p = perguntasBase[indiceAtual];
+            if (correto) {
+                logs.push(`✅ No objeto <b>${p.obj}</b>, você escolheu os dados corretos.`);
+            } else {
+                nota -= 2;
+                logs.push(`❌ No objeto <b>${p.obj}</b>, você escolheu dados menos importantes.`);
+            }
+            indiceAtual++;
+            mostrarPergunta();
+        }
+
+        function finalizar() {
+            document.getElementById('vNota').innerText = Math.max(0, nota).toFixed(1);
+            document.getElementById('vRelatorio').innerHTML = logs.join("<br><br>");
+            document.getElementById('modal-titulo').innerText = nota >= 8 ? "Ótimo Trabalho!" : "Tente Analisar Melhor!";
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        mostrarPergunta();
+    </script>
+</body>
+</html>
