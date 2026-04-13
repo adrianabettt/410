@@ -1,154 +1,866 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Detetive de Registros - BNCC</title>
-    <style>
-        * { box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; background: #f0f2f5; 
-            margin: 0; padding: 10px; height: 100vh; 
-            display: flex; flex-direction: column; overflow: hidden; text-align: center;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secretaria Escolar Virtual</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap');
 
-        h1 { color: #2d3436; margin: 5px 0; font-size: 22px; }
-        .instrucoes { background: #ffffff; padding: 10px; border-radius: 8px; font-size: 14px; margin: 5px auto; max-width: 800px; border-bottom: 4px solid #0984e3; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        #jogo-container { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+:root {
+  --azul:       #2563EB;
+  --azul-claro: #DBEAFE;
+  --azul-txt:   #1E3A8A;
+  --verde:      #16A34A;
+  --verde-cl:   #DCFCE7;
+  --verde-txt:  #14532D;
+  --amarelo:    #D97706;
+  --amarelo-cl: #FEF3C7;
+  --amarelo-txt:#78350F;
+  --vermelho:   #DC2626;
+  --vermelho-cl:#FEE2E2;
+  --vermelho-txt:#7F1D1D;
+  --roxo:       #7C3AED;
+  --roxo-cl:    #EDE9FE;
+  --roxo-txt:   #3B0764;
+  --cinza-bg:   #F8FAFC;
+  --cinza-card: #FFFFFF;
+  --cinza-borda:#E2E8F0;
+  --cinza-txt:  #475569;
+  --txt-main:   #1E293B;
+  --radius:     12px;
+  --shadow:     0 2px 8px rgba(0,0,0,0.08);
+}
 
-        .pergunta-card { 
-            background: white; padding: 20px; border-radius: 15px; 
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1); width: 450px; 
-            animation: deslizar 0.5s ease-out;
-        }
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background: var(--cinza-bg);
+  color: var(--txt-main);
+  min-height: 100vh;
+  font-size: 15px;
+}
 
-        @keyframes deslizar { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+/* ── TOPO ── */
+.topo {
+  background: var(--azul);
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.topo-icon { font-size: 28px; flex-shrink: 0; }
+.topo-info h1 { font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800; line-height: 1.2; }
+.topo-info p  { font-size: 12px; opacity: .85; margin-top: 2px; }
+.topo-placar {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.placar-num {
+  background: rgba(255,255,255,.18);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.barra-wrap { display: flex; align-items: center; gap: 8px; }
+.barra-prog {
+  width: 130px;
+  height: 10px;
+  background: rgba(255,255,255,.25);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.barra-fill {
+  height: 100%;
+  background: #86EFAC;
+  border-radius: 5px;
+  transition: width .5s ease;
+}
+.barra-label { font-size: 12px; opacity: .9; white-space: nowrap; }
 
-        .opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        
-        .btn-opcao { 
-            background: #0984e3; color: white; border: none; padding: 12px; 
-            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s;
-        }
-        .btn-opcao:hover { background: #00cec9; transform: scale(1.05); }
+/* ── LAYOUT PRINCIPAL ── */
+.main {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+@media (max-width: 720px) {
+  .main { grid-template-columns: 1fr; }
+}
 
-        /* Modal */
-        #modal {
-            display: none; position: fixed; z-index: 100; left: 0; top: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.8);
-            align-items: center; justify-content: center;
-        }
-        .modal-content {
-            background: white; padding: 25px; border-radius: 20px; width: 400px;
-            text-align: center; position: relative;
-        }
-        .nota-final { font-size: 50px; font-weight: bold; color: #00b894; }
-        .relatorio { 
-            background: #f1f2f6; border: 1px solid #bdc3c7; border-radius: 8px;
-            height: 150px; overflow-y: auto; text-align: left; padding: 10px; 
-            font-size: 13px; margin: 15px 0; 
-        }
+/* ── GRADE DE FICHAS ── */
+.grade-fichas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+}
 
-        footer { font-size: 11px; color: #636e72; margin-top: auto; padding: 5px; border-top: 1px solid #bdc3c7; }
-    </style>
+.ficha {
+  background: var(--cinza-card);
+  border: 2px solid var(--cinza-borda);
+  border-radius: var(--radius);
+  padding: 14px;
+  transition: border-color .25s, box-shadow .25s;
+}
+.ficha.destaque {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px var(--azul-claro);
+}
+
+.ficha-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.nome-aluno {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.campo-bloco { margin-bottom: 7px; }
+.campo-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+.campo-rotulo {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--cinza-txt);
+}
+.btn-remover {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  border: 1px solid var(--vermelho);
+  background: var(--vermelho-cl);
+  color: var(--vermelho-txt);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  line-height: 1.6;
+}
+.btn-remover:hover { background: #FECACA; }
+
+.campo-input {
+  width: 100%;
+  font-size: 12px;
+  padding: 5px 8px;
+  border: 1.5px solid var(--cinza-borda);
+  border-radius: 6px;
+  background: var(--cinza-bg);
+  color: var(--txt-main);
+  font-family: 'Nunito Sans', sans-serif;
+  transition: border-color .2s, background .2s;
+}
+.campo-input:focus {
+  outline: none;
+  border-color: var(--azul);
+  background: #fff;
+}
+.campo-input.novo-valor {
+  border-color: var(--verde);
+  background: var(--verde-cl);
+}
+
+.add-campo {
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--cinza-borda);
+}
+.add-campo input {
+  flex: 1;
+  font-size: 11px;
+  padding: 4px 7px;
+  border: 1.5px solid var(--cinza-borda);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--txt-main);
+  font-family: 'Nunito Sans', sans-serif;
+}
+.add-campo input:focus { outline: none; border-color: var(--verde); }
+.add-campo input::placeholder { color: #94A3B8; }
+.btn-add {
+  padding: 4px 10px;
+  font-size: 18px;
+  line-height: 1;
+  border-radius: 6px;
+  border: 1.5px solid var(--verde);
+  background: var(--verde-cl);
+  color: var(--verde-txt);
+  cursor: pointer;
+  font-weight: 700;
+}
+.btn-add:hover { background: #BBF7D0; }
+
+/* ── PAINEL DE MISSÃO ── */
+.painel {
+  background: var(--cinza-card);
+  border: 2px solid var(--cinza-borda);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: sticky;
+  top: 12px;
+  align-self: start;
+}
+.painel-titulo {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cmd-card {
+  border-radius: 10px;
+  padding: 13px;
+  margin-bottom: 12px;
+  border-left: 4px solid var(--azul);
+  background: #F1F5FF;
+}
+.cmd-numero {
+  font-size: 11px;
+  color: var(--cinza-txt);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.badge-op {
+  display: inline-block;
+  font-size: 11px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+.op-consultar { background: var(--azul-claro); color: var(--azul-txt); }
+.op-alterar   { background: var(--amarelo-cl); color: var(--amarelo-txt); }
+.op-adicionar { background: var(--verde-cl);   color: var(--verde-txt); }
+.op-remover   { background: var(--vermelho-cl);color: var(--vermelho-txt); }
+
+.cmd-texto {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  color: var(--txt-main);
+}
+
+.dica-box {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--amarelo-txt);
+  background: var(--amarelo-cl);
+  border: 1px dashed var(--amarelo);
+  border-radius: 7px;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  display: none;
+}
+.dica-box.visivel { display: block; }
+
+.btn-row { display: flex; gap: 7px; flex-wrap: wrap; }
+.btn-dica {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1.5px solid var(--cinza-borda);
+  background: #fff;
+  color: var(--cinza-txt);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+.btn-dica:hover { background: var(--cinza-bg); }
+.btn-confirmar {
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: 1.5px solid var(--verde);
+  background: var(--verde-cl);
+  color: var(--verde-txt);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+.btn-confirmar:hover { background: #BBF7D0; }
+
+/* ── HISTÓRICO ── */
+.historico {
+  margin-top: 12px;
+  border-top: 1.5px solid var(--cinza-borda);
+  padding-top: 10px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+.hist-titulo {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--cinza-txt);
+  margin-bottom: 6px;
+}
+.hist-item {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  line-height: 1.4;
+}
+.hist-ok   { background: var(--verde-cl);   color: var(--verde-txt); }
+.hist-dica { background: var(--amarelo-cl); color: var(--amarelo-txt); }
+.hist-erro { background: var(--vermelho-cl);color: var(--vermelho-txt); }
+
+/* ── TELA DE CONCLUSÃO ── */
+.tela-fim {
+  display: none;
+  text-align: center;
+  padding: 16px 8px;
+}
+.estrelas { font-size: 32px; letter-spacing: 4px; margin-bottom: 10px; }
+.tela-fim h2 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+.tela-fim p { font-size: 13px; color: var(--cinza-txt); line-height: 1.6; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  display: none;
+  z-index: 9999;
+  pointer-events: none;
+  max-width: 280px;
+  box-shadow: var(--shadow);
+}
+.toast-ok   { background: var(--verde-cl);   color: var(--verde-txt);   border: 1.5px solid var(--verde); }
+.toast-erro { background: var(--vermelho-cl); color: var(--vermelho-txt);border: 1.5px solid var(--vermelho); }
+
+/* ── LEGENDA DE OPERAÇÕES ── */
+.legenda {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid var(--cinza-borda);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+}
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.leg-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ── NOTA FINAL ── */
+.nota-box {
+  background: var(--azul-claro);
+  border-radius: 12px;
+  padding: 14px 12px 10px;
+  margin: 12px 0 10px;
+  text-align: center;
+}
+.nota-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--azul-txt);
+  margin-bottom: 4px;
+}
+.nota-valor {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--azul);
+}
+.nota-valor span#nota-numero { font-size: 48px; }
+.nota-total { font-size: 22px; color: var(--azul-txt); }
+.nota-conceito {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--azul-txt);
+  margin-top: 4px;
+}
+
+/* ── RODAPÉ ── */
+.rodape {
+  text-align: center;
+  padding: 14px 16px;
+  font-size: 12px;
+  color: var(--cinza-txt);
+  border-top: 1px solid var(--cinza-borda);
+  margin-top: 24px;
+  font-family: 'Nunito Sans', sans-serif;
+}
+.rodape strong {
+  color: var(--txt-main);
+  font-weight: 600;
+}
+</style>
 </head>
 <body>
 
-    <h1>🔍 Detetive de Registros</h1>
-    
-    <div class="instrucoes">
-        <strong>Missão:</strong> Analise o objeto e decida qual é a melhor forma de organizá-lo em um registro (ficha). 
-        <p>Cada acerto vale 1 ponto. Erros subtraem 2 pontos da nota máxima (10).</p>
+<!-- TOPO -->
+<div class="topo">
+  <div class="topo-icon">🏫</div>
+  <div class="topo-info">
+    <h1>Secretaria Escolar Virtual</h1>
+    <p>EF04CO02 — Manipulando Registros</p>
+  </div>
+  <div class="topo-placar">
+    <span class="placar-num" id="placar">0 de 10 operações</span>
+    <div class="barra-wrap">
+      <div class="barra-prog"><div class="barra-fill" id="barra" style="width:0%"></div></div>
+      <span class="barra-label" id="barra-label">Comando 1</span>
+    </div>
+  </div>
+</div>
+
+<!-- LEGENDA -->
+<div class="legenda">
+  <span style="color:#475569;font-weight:600">Tipos de operação:</span>
+  <span class="leg-item"><span class="leg-dot" style="background:#2563EB"></span>Consultar</span>
+  <span class="leg-item"><span class="leg-dot" style="background:#D97706"></span>Alterar</span>
+  <span class="leg-item"><span class="leg-dot" style="background:#16A34A"></span>Adicionar</span>
+  <span class="leg-item"><span class="leg-dot" style="background:#DC2626"></span>Remover</span>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="main">
+  <div class="painel">
+    <div class="painel-titulo">🎯 Missão atual</div>
+
+    <div id="cmd-card" class="cmd-card">
+      <div class="cmd-numero" id="cmd-numero">Comando 1 de 10</div>
+      <span class="badge-op" id="cmd-badge">Consultar</span>
+      <div class="cmd-texto" id="cmd-texto">Carregando...</div>
+      <div class="dica-box" id="dica-box">Dica aqui</div>
+      <div class="btn-row">
+        <button class="btn-dica" onclick="verDica()">💡 Ver dica</button>
+        <button class="btn-confirmar" onclick="confirmar()">✓ Confirmei!</button>
+      </div>
     </div>
 
-    <div id="jogo-container">
-        <div id="questoes-area">
-            </div>
+    <div class="tela-fim" id="tela-fim">
+      <div class="estrelas" id="estrelas">⭐⭐⭐</div>
+      <h2>Missão concluída!</h2>
+      <div class="nota-box">
+        <div class="nota-label">Sua nota</div>
+        <div class="nota-valor"><span id="nota-numero">10</span><span class="nota-total">/10</span></div>
+        <div class="nota-conceito" id="conceito-txt">Excelente!</div>
+      </div>
+      <p id="txt-fim"></p>
     </div>
 
-    <div id="modal">
-        <div class="modal-content">
-            <h2 id="modal-titulo">Resultado da Investigação</h2>
-            <div class="nota-final" id="vNota">10.0</div>
-            <div class="relatorio" id="vRelatorio"></div>
-            <button onclick="location.reload()" style="padding: 10px 20px; cursor: pointer; border-radius: 8px; border: none; background: #0984e3; color: white; font-weight: bold;">Refazer Missão</button>
-        </div>
+    <div class="historico">
+      <div class="hist-titulo">Histórico de operações</div>
+      <div id="hist-lista"></div>
     </div>
+  </div>
 
-    <footer> 
-        <p><strong>Material Pedagógico - Profª Adriana Bett Terebinto © 2026</strong></p> 
-        <p>São Lourenço do Oeste - SC</p> 
-    </footer>
+  <div class="grade-fichas" id="grade"></div>
+</div>
 
-    <script>
-        const perguntasBase = [
-            { obj: "📚 Livro de Biblioteca", resp: "Título, Autor e Ano", errada: "Cor da capa e Peso" },
-            { obj: "👤 Aluno na Escola", resp: "Nome, Turma e Nota", errada: "Comida favorita e Altura" },
-            { obj: "🚗 Carro no Estacionamento", resp: "Placa, Modelo e Cor", errada: "Nome do dono e Velocidade" },
-            { obj: "🍕 Pedido de Pizza", resp: "Sabor, Endereço e Valor", errada: "Tamanho da caixa e Nome do Pizzaiolo" },
-            { obj: "🎮 Personagem de RPG", resp: "Nome, Poder e Vida", errada: "Data de nascimento e Cidade" }
-        ];
+<div class="toast" id="toast"></div>
 
-        let indiceAtual = 0;
-        let nota = 10;
-        let logs = [];
+<script>
+var CORES = [
+  { bg: '#DBEAFE', co: '#1E3A8A' },
+  { bg: '#DCFCE7', co: '#14532D' },
+  { bg: '#FEF3C7', co: '#78350F' },
+  { bg: '#FEE2E2', co: '#7F1D1D' },
+  { bg: '#EDE9FE', co: '#3B0764' },
+  { bg: '#FCE7F3', co: '#831843' }
+];
 
-        // Algoritmo Fisher-Yates para embaralhar as perguntas
-        function embaralhar(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+var LABEL = {
+  turma:    'Turma',
+  idade:    'Idade',
+  telefone: 'Telefone',
+  endereco: 'Endereço',
+  altura:   'Altura',
+  email:    'E-mail'
+};
 
-        embaralhar(perguntasBase);
+var ORDEM = ['turma', 'idade', 'telefone', 'endereco', 'altura', 'email'];
 
-        function mostrarPergunta() {
-            if (indiceAtual >= perguntasBase.length) {
-                finalizar();
-                return;
-            }
+var alunos = [
+  { id: 'a1', nome: 'Ana Lima',    turma: '4ºA', idade: '9',  telefone: '(44) 98801-1122', endereco: 'Rua das Palmeiras, 10', altura: '1,32m' },
+  { id: 'a2', nome: 'Bruno Reis',  turma: '4ºB', idade: '10', telefone: '(44) 98802-3344', endereco: 'Av. Brasil, 205',       altura: '1,40m' },
+  { id: 'a3', nome: 'Carla Souza', turma: '4ºA', idade: '9',  telefone: '(44) 98803-5566', endereco: 'Rua das Flores, 30',    altura: '1,35m' },
+  { id: 'a4', nome: 'Diego Mota',  turma: '4ºC', idade: '10', telefone: '(44) 98804-7788', endereco: 'Rua do Sol, 88',        altura: '1,38m' },
+  { id: 'a5', nome: 'Eva Pires',   turma: '4ºB', idade: '9',  telefone: '(44) 98805-9900', endereco: 'Rua Verde, 55',         altura: '1,30m' },
+  { id: 'a6', nome: 'Felipe Neto', turma: '4ºC', idade: '11', telefone: '(44) 98806-1234', endereco: 'Av. Flores, 12',        altura: '1,45m' }
+];
 
-            const p = perguntasBase[indiceAtual];
-            const area = document.getElementById('questoes-area');
-            
-            // Embaralhar as opções de resposta (Direita/Esquerda)
-            let botoes = [
-                `<button class="btn-opcao" onclick="verificar(true)">${p.resp}</button>`,
-                `<button class="btn-opcao" onclick="verificar(false)">${p.errada}</button>`
-            ];
-            embaralhar(botoes);
+var CMDS = [
+  {
+    tipo: 'consultar',
+    texto: 'Consulte o telefone da Carla Souza.',
+    dica: 'Procure a ficha da Carla Souza (está marcada com borda azul) e leia o campo Telefone. Depois clique em "Confirmei!".',
+    alvo: 'a3', campo: 'telefone',
+    validar: function(a) { return a.telefone !== undefined; },
+    op: 'Consultar', classe: 'op-consultar'
+  },
+  {
+    tipo: 'consultar',
+    texto: 'Qual é a turma do Diego Mota? Confira na ficha dele.',
+    dica: 'Procure a ficha do Diego Mota e leia o valor do campo Turma.',
+    alvo: 'a4', campo: 'turma',
+    validar: function(a) { return a.turma !== undefined; },
+    op: 'Consultar', classe: 'op-consultar'
+  },
+  {
+    tipo: 'alterar',
+    texto: 'Altere o endereço do Bruno Reis para: Rua Nova, 100',
+    dica: 'Clique dentro do campo Endereço na ficha do Bruno Reis, apague o texto atual e escreva: Rua Nova, 100',
+    alvo: 'a2', campo: 'endereco', val: 'Rua Nova, 100',
+    validar: function(a) { return a.endereco === 'Rua Nova, 100'; },
+    op: 'Alterar', classe: 'op-alterar'
+  },
+  {
+    tipo: 'alterar',
+    texto: 'Altere a turma da Ana Lima para: 4ºC',
+    dica: 'Clique no campo Turma da ficha da Ana Lima e troque o valor para 4ºC.',
+    alvo: 'a1', campo: 'turma', val: '4ºC',
+    validar: function(a) { return a.turma === '4ºC'; },
+    op: 'Alterar', classe: 'op-alterar'
+  },
+  {
+    tipo: 'adicionar',
+    texto: 'Adicione o campo E-mail na ficha da Eva Pires e preencha com: eva@escola.br',
+    dica: 'No final da ficha da Eva Pires, clique no campo "Novo campo...", escreva Email e clique no botão +. Depois preencha o valor: eva@escola.br',
+    alvo: 'a5', campo: 'email', val: 'eva@escola.br',
+    validar: function(a) {
+      for (var k in a) { if (k.indexOf('email') >= 0 || k.indexOf('e_mail') >= 0 || k === 'e-mail') { if (a[k] === 'eva@escola.br') return true; } }
+      return a.email === 'eva@escola.br';
+    },
+    op: 'Adicionar', classe: 'op-adicionar'
+  },
+  {
+    tipo: 'adicionar',
+    texto: 'Adicione o campo E-mail na ficha do Felipe Neto e preencha com: felipe@escola.br',
+    dica: 'No final da ficha do Felipe Neto, adicione o campo Email e preencha: felipe@escola.br',
+    alvo: 'a6', campo: 'email', val: 'felipe@escola.br',
+    validar: function(a) {
+      for (var k in a) { if (k.indexOf('email') >= 0 || k.indexOf('e_mail') >= 0 || k === 'e-mail') { if (a[k] === 'felipe@escola.br') return true; } }
+      return a.email === 'felipe@escola.br';
+    },
+    op: 'Adicionar', classe: 'op-adicionar'
+  },
+  {
+    tipo: 'remover',
+    texto: 'Remova o campo Altura da ficha da Ana Lima. Esse dado não é necessário.',
+    dica: 'Na ficha da Ana Lima, clique no botão vermelho "Remover" que aparece ao lado do campo Altura.',
+    alvo: 'a1', campo: 'altura',
+    validar: function(a) { return a.altura === undefined; },
+    op: 'Remover', classe: 'op-remover'
+  },
+  {
+    tipo: 'remover',
+    texto: 'Remova o campo Altura da ficha do Bruno Reis.',
+    dica: 'Clique no botão vermelho "Remover" ao lado do campo Altura na ficha do Bruno Reis.',
+    alvo: 'a2', campo: 'altura',
+    validar: function(a) { return a.altura === undefined; },
+    op: 'Remover', classe: 'op-remover'
+  },
+  {
+    tipo: 'consultar',
+    texto: 'Quantos anos tem o Felipe Neto? Leia o campo Idade na ficha dele.',
+    dica: 'Procure a ficha do Felipe Neto e leia o valor do campo Idade.',
+    alvo: 'a6', campo: 'idade',
+    validar: function(a) { return a.idade !== undefined; },
+    op: 'Consultar', classe: 'op-consultar'
+  },
+  {
+    tipo: 'alterar',
+    texto: 'Altere o telefone da Carla Souza para: (44) 98899-0011',
+    dica: 'Clique no campo Telefone da ficha da Carla Souza, apague o número antigo e escreva: (44) 98899-0011',
+    alvo: 'a3', campo: 'telefone', val: '(44) 98899-0011',
+    validar: function(a) { return a.telefone === '(44) 98899-0011'; },
+    op: 'Alterar', classe: 'op-alterar'
+  }
+];
 
-            area.innerHTML = `
-                <div class="pergunta-card">
-                    <p>Como devemos registrar as informações de um:</p>
-                    <h3>${p.obj}</h3>
-                    <div class="opcoes">${botoes.join('')}</div>
-                    <p style="font-size: 12px; color: #636e72; margin-top: 15px;">Pergunta ${indiceAtual + 1} de 5</p>
-                </div>
-            `;
-        }
+var cmdAtual = 0;
+var acertos  = 0;
+var dicasUsadas = 0;
+var toastTimer = null;
 
-        function verificar(correto) {
-            const p = perguntasBase[indiceAtual];
-            if (correto) {
-                logs.push(`✅ No objeto <b>${p.obj}</b>, você escolheu os dados corretos.`);
-            } else {
-                nota -= 2;
-                logs.push(`❌ No objeto <b>${p.obj}</b>, você escolheu dados menos importantes.`);
-            }
-            indiceAtual++;
-            mostrarPergunta();
-        }
+function iniciais(nome) {
+  var partes = nome.split(' ');
+  var a = partes[0] ? partes[0][0] : '';
+  var b = partes[1] ? partes[1][0] : '';
+  return (a + b).toUpperCase();
+}
 
-        function finalizar() {
-            document.getElementById('vNota').innerText = Math.max(0, nota).toFixed(1);
-            document.getElementById('vRelatorio').innerHTML = logs.join("<br><br>");
-            document.getElementById('modal-titulo').innerText = nota >= 8 ? "Ótimo Trabalho!" : "Tente Analisar Melhor!";
-            document.getElementById('modal').style.display = 'flex';
-        }
+function syncCampos(aid) {
+  var a = null;
+  for (var i = 0; i < alunos.length; i++) {
+    if (alunos[i].id === aid) { a = alunos[i]; break; }
+  }
+  if (!a) return;
+  for (var c = 0; c < ORDEM.length; c++) {
+    var chave = ORDEM[c];
+    if (a[chave] !== undefined) {
+      var el = document.getElementById('inp-' + aid + '-' + chave);
+      if (el) a[chave] = el.value;
+    }
+  }
+  for (var chave in a) {
+    var el = document.getElementById('inp-' + aid + '-' + chave);
+    if (el) a[chave] = el.value;
+  }
+}
 
-        mostrarPergunta();
-    </script>
+function removerCampo(aid, campo) {
+  var a = null;
+  for (var i = 0; i < alunos.length; i++) {
+    if (alunos[i].id === aid) { a = alunos[i]; break; }
+  }
+  if (a) delete a[campo];
+  renderFichas();
+  mostrarToast('Campo "' + (LABEL[campo] || campo) + '" removido!', 'ok');
+}
+
+function adicionarCampo(aid) {
+  var inp = document.getElementById('nc-' + aid);
+  if (!inp) return;
+  var nome = inp.value.trim();
+  if (!nome) return;
+
+  var chave = nome.toLowerCase();
+  var map = { 'á':'a','à':'a','ã':'a','â':'a','é':'e','ê':'e','í':'i','ó':'o','ô':'o','õ':'o','ú':'u','ç':'c' };
+  var out = '';
+  for (var k = 0; k < chave.length; k++) {
+    out += map[chave[k]] || chave[k];
+  }
+  chave = out;
+  chave = chave.replace(/[-\s]+/g, '_');
+  chave = chave.replace(/[^a-z0-9_]/g, '');
+
+  var a = null;
+  for (var i = 0; i < alunos.length; i++) {
+    if (alunos[i].id === aid) { a = alunos[i]; break; }
+  }
+  if (a && a[chave] === undefined) {
+    a[chave] = '';
+    if (!LABEL[chave]) LABEL[chave] = nome;
+    if (ORDEM.indexOf(chave) < 0) ORDEM.push(chave);
+  }
+  inp.value = '';
+  renderFichas();
+  var el = document.getElementById('inp-' + aid + '-' + chave);
+  if (el) el.focus();
+}
+
+function renderFichas() {
+  var cmd = cmdAtual < CMDS.length ? CMDS[cmdAtual] : null;
+  var grade = document.getElementById('grade');
+  grade.innerHTML = '';
+
+  for (var i = 0; i < alunos.length; i++) {
+    var a = alunos[i];
+    var destaque = cmd && cmd.alvo === a.id;
+    var cor = CORES[i % CORES.length];
+
+    var ficha = document.createElement('div');
+    ficha.className = 'ficha' + (destaque ? ' destaque' : '');
+    ficha.id = 'ficha-' + a.id;
+
+    var html = '';
+    html += '<div class="ficha-cabecalho">';
+    html += '<div class="avatar" style="background:' + cor.bg + ';color:' + cor.co + '">' + iniciais(a.nome) + '</div>';
+    html += '<div class="nome-aluno">' + a.nome + '</div>';
+    html += '</div>';
+
+    for (var c = 0; c < ORDEM.length; c++) {
+      var chave = ORDEM[c];
+      if (a[chave] === undefined) continue;
+      html += '<div class="campo-bloco">';
+      html += '<div class="campo-topo">';
+      html += '<span class="campo-rotulo">' + (LABEL[chave] || chave) + '</span>';
+      html += '<button class="btn-remover" onclick="removerCampo(\'' + a.id + '\',\'' + chave + '\')">Remover</button>';
+      html += '</div>';
+      var val = a[chave].replace(/"/g, '&quot;');
+      html += '<input class="campo-input" type="text" id="inp-' + a.id + '-' + chave + '" value="' + val + '">';
+      html += '</div>';
+    }
+
+    html += '<div class="add-campo">';
+    html += '<input type="text" id="nc-' + a.id + '" placeholder="Novo campo...">';
+    html += '<button class="btn-add" onclick="adicionarCampo(\'' + a.id + '\')">+</button>';
+    html += '</div>';
+
+    ficha.innerHTML = html;
+
+    var ncInp = ficha.querySelector('#nc-' + a.id);
+    if (ncInp) {
+      ncInp.onkeydown = (function(id) {
+        return function(e) {
+          if (e.key === 'Enter') adicionarCampo(id);
+        };
+      })(a.id);
+    }
+
+    grade.appendChild(ficha);
+  }
+}
+
+function atualizarPainel() {
+  var total = CMDS.length;
+  document.getElementById('placar').textContent = acertos + ' de ' + total + ' operações';
+  var pct = Math.round((acertos / total) * 100);
+  document.getElementById('barra').style.width = pct + '%';
+
+  if (cmdAtual >= total) {
+    document.getElementById('cmd-card').style.display = 'none';
+    document.getElementById('tela-fim').style.display = 'block';
+    var nota = Math.round((acertos / total) * 10);
+    var e = nota === 10 ? '⭐⭐⭐' : nota >= 7 ? '⭐⭐' : '⭐';
+    document.getElementById('estrelas').textContent = e;
+    var conceito = nota === 10 ? 'Excelente!' : nota >= 7 ? 'Muito bom!' : nota >= 5 ? 'Bom trabalho!' : 'Continue praticando!';
+    document.getElementById('nota-numero').textContent = nota;
+    document.getElementById('conceito-txt').textContent = conceito;
+    document.getElementById('txt-fim').textContent =
+      'Acertos: ' + acertos + ' de ' + total + '   |   Dicas usadas: ' + dicasUsadas;
+    document.getElementById('barra-label').textContent = 'Concluído!';
+    document.getElementById('placar').textContent = acertos + ' de ' + total + ' operações';
+    return;
+  }
+
+  var cmd = CMDS[cmdAtual];
+  document.getElementById('cmd-numero').textContent = 'Comando ' + (cmdAtual + 1) + ' de ' + total;
+  document.getElementById('cmd-badge').textContent  = cmd.op;
+  document.getElementById('cmd-badge').className    = 'badge-op ' + cmd.classe;
+  document.getElementById('cmd-texto').textContent  = cmd.texto;
+  document.getElementById('dica-box').textContent   = cmd.dica;
+  document.getElementById('dica-box').className     = 'dica-box';
+  document.getElementById('barra-label').textContent = 'Comando ' + (cmdAtual + 1);
+
+  var cores = { 'op-consultar': '#2563EB', 'op-alterar': '#D97706', 'op-adicionar': '#16A34A', 'op-remover': '#DC2626' };
+  document.getElementById('cmd-card').style.borderLeftColor = cores[cmd.classe] || '#2563EB';
+  var bgCores = { 'op-consultar': '#EFF6FF', 'op-alterar': '#FFFBEB', 'op-adicionar': '#F0FDF4', 'op-remover': '#FFF1F2' };
+  document.getElementById('cmd-card').style.background = bgCores[cmd.classe] || '#F1F5FF';
+}
+
+function verDica() {
+  document.getElementById('dica-box').className = 'dica-box visivel';
+  dicasUsadas++;
+  addHistorico('Dica usada no comando ' + (cmdAtual + 1) + '.', 'dica');
+}
+
+function confirmar() {
+  if (cmdAtual >= CMDS.length) return;
+  var cmd = CMDS[cmdAtual];
+
+  for (var i = 0; i < alunos.length; i++) {
+    syncCampos(alunos[i].id);
+  }
+
+  var aluno = null;
+  for (var i = 0; i < alunos.length; i++) {
+    if (alunos[i].id === cmd.alvo) { aluno = alunos[i]; break; }
+  }
+
+  if (cmd.tipo === 'alterar' || cmd.tipo === 'adicionar') {
+    var el = document.getElementById('inp-' + cmd.alvo + '-' + cmd.campo);
+    if (el && aluno) aluno[cmd.campo] = el.value.trim();
+  }
+
+  if (cmd.validar(aluno)) {
+    acertos++;
+    addHistorico(cmd.op + ': ' + cmd.texto, 'ok');
+    mostrarToast('Muito bem! Operação correta! ✓', 'ok');
+    cmdAtual++;
+    atualizarPainel();
+    renderFichas();
+  } else {
+    addHistorico('Tentativa incorreta no comando ' + (cmdAtual + 1) + '.', 'erro');
+    mostrarToast('Ops! Verifique a ficha e tente de novo.', 'erro');
+  }
+}
+
+function addHistorico(texto, tipo) {
+  var lista = document.getElementById('hist-lista');
+  var div = document.createElement('div');
+  div.className = 'hist-item hist-' + tipo;
+  var icone = tipo === 'ok' ? '✓' : tipo === 'dica' ? '💡' : '!';
+  div.innerHTML = '<span style="flex-shrink:0">' + icone + '</span><span>' + texto + '</span>';
+  lista.insertBefore(div, lista.firstChild);
+}
+
+function mostrarToast(msg, tipo) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast toast-' + tipo;
+  t.style.display = 'block';
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.style.display = 'none'; }, 2400);
+}
+
+renderFichas();
+atualizarPainel();
+</script>
+
+<div class="rodape">
+  Atividade desenvolvida por <strong>Prof&#xAA; Adriana Bett Terebinto</strong> &nbsp;|&nbsp; 4&#xBA; Ano &mdash; Computação / Pensamento Computacional &nbsp;|&nbsp;  &mdash; EF04CO02
+</div>
 </body>
 </html>
